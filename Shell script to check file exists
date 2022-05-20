@@ -1,0 +1,24 @@
+#!/bin/bash
+#We tell user that he need to enter filename
+echo -n "Please enter file to check: "
+#We write filename to variable file
+read file
+#We tell user that he need to enter path to file
+echo -n "Please enter path to check: "
+#We write path to variable path
+read path
+#we check if we have read permission on path
+if [ -r $path ]
+then
+#if we have read permissions, we check if file exist
+if [ -f ${path}/${file} ]
+then
+#if file exist, we tell user
+echo "File ${path}/${file} exist"
+#end of if loop
+fi
+#if we don't have read permissions on path
+else
+#we warn user that we don't have read permissions on path
+echo "You don't have access to folder $path"
+fi
