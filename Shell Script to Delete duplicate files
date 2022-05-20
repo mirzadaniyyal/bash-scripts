@@ -1,0 +1,91 @@
+#!/bin/bash
+
+#file, where we will store full list of files.
+ListOfFiles=/tmp/listoffiles.txt
+
+#we ask user to enter directory where search for duplicated files
+echo -n "Please enter directory where to search for duplicated files: "
+
+#we read user input
+while read dir
+
+do
+
+#we check if user input is not empty
+test -z "$dir" && {
+
+#if user input empty we ask once more to enter directory
+echo -n "Please enter directory: "
+
+continue
+
+}
+
+#if directory entered, exit from while loop
+break
+
+done
+
+#getting list of files inside entered directory
+find $dir -type f -print > $ListOfFiles
+
+#writing list of files to variable
+FileList=`cat $ListOfFiles`
+
+#we get number of files
+count=`wc -l $ListOfFiles| awk '{print $1}'`
+
+#counter
+i=1
+
+#we get files one by one
+for file in $FileList
+
+do
+
+#just make this variable empty for every loop
+samefiles=""
+
+#we need to get all non-proceeded files
+let tailvalue=$count-$i
+
+#we get only filename, without path
+filename=$(basename $file)
+
+#getting list of un-proceeded files, and we check if there is file with same filename
+samefiles=`tail -${tailvalue} $ListOfFiles | grep $filename`
+
+#starting loop for all same files
+for samefile in $samefiles
+
+do
+
+#we get md5sum of filename with same name
+msf=`md5sum $samefile | awk '{print $1}'`
+
+#we get md5sum of original file
+ms=`md5sum $file | awk '{print $1}'`
+
+#we compare md5sums
+if [ "$msf" = "$ms" ]; then
+
+#if md5sums equal, we tell user about duplicated files
+echo "File $file duplicated to $samefile"
+
+#end of if loop
+fi
+
+#end of while loop
+done
+
+#increase counter by 1
+let i=$i+1
+
+done
+Script Output
+
+./finddup.sh
+
+Please enter directory where to search for duplicated files: /tmp
+
+File /tmp/1/user.list duplicated to /tmp/user.list
